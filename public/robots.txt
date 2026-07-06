@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://balaji-buildcon.onrender.com/sitemap.xml
