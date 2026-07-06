@@ -29,8 +29,7 @@ form.addEventListener("submit", async function (e) {
 
     try {
 
-const response = await fetch("/api/contact", {
-            method: "POST",
+const response = await fetch("https://script.google.com/macros/s/AKfycbzMdSfsgU-8_oYYhFBsIPszLY1OYUm98h4_aF2TkbGQA1dUVgyySs0jhI3acBgIXAvb/exec", {            method: "POST",
 
             headers: {
                 "Content-Type": "application/json"
@@ -40,11 +39,12 @@ const response = await fetch("/api/contact", {
 
         });
 
-        const data = await response.json();
-
-        alert(data.message);
-
-        form.reset();
+        if (response.ok) {
+    alert("Message submitted successfully!");
+    form.reset();
+} else {
+    alert("Failed to submit message.");
+}
 
     } catch (error) {
 
