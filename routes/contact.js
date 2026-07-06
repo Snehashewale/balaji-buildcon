@@ -1,44 +1,27 @@
 const express = require("express");
 const router = express.Router();
+const axios = require("axios");
 
-const fs = require("fs");
-const path = require("path");
+router.post("/", async (req, res) => {
 
-router.post("/", (req, res) => {
     try {
+
         const { name, email, phone, message } = req.body;
 
-        const dataDir = path.join(__dirname, "../data");
-
-        // Create data folder if it doesn't exist
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir);
-        }
-
-        const filePath = path.join(dataDir, "messages.json");
-
-        let messages = [];
-
-        // Read existing messages
-        if (fs.existsSync(filePath)) {
-            const fileData = fs.readFileSync(filePath, "utf8");
-
-            if (fileData.trim()) {
-                messages = JSON.parse(fileData);
+        const response = await axios.post(
+            process.env.GOOGLE_SCRIPT_URL,
+            {
+                name,
+                email,
+                phone,
+                message
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }
-        }
-
-        // Add new message
-        messages.push({
-            name,
-            email,
-            phone,
-            message,
-            date: new Date().toLocaleString()
-        });
-
-        // Save messages
-        fs.writeFileSync(filePath, JSON.stringify(messages, null, 4));
+        );
 
         res.json({
             success: true,
@@ -46,13 +29,16 @@ router.post("/", (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
+
+        console.error("Google Sheets Error:", error.message);
 
         res.status(500).json({
             success: false,
-            message: "Something went wrong."
+            message: "Failed to submit message."
         });
+
     }
+
 });
 
 module.exports = router;
