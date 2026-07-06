@@ -29,8 +29,7 @@ form.addEventListener("submit", async function (e) {
 
     try {
 
-        const response = await fetch("/api/contact", {
-
+const response = await fetch("/api/contact", {
             method: "POST",
 
             headers: {

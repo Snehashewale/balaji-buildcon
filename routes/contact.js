@@ -5,36 +5,54 @@ const fs = require("fs");
 const path = require("path");
 
 router.post("/", (req, res) => {
+    try {
+        const { name, email, phone, message } = req.body;
 
-    const { name, email, phone, message } = req.body;
+        const dataDir = path.join(__dirname, "../data");
 
-    const newMessage = {
-        name,
-        email,
-        phone,
-        message,
-        date: new Date().toLocaleString()
-    };
+        // Create data folder if it doesn't exist
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir);
+        }
 
-    const filePath = path.join(__dirname, "../data/messages.json");
+        const filePath = path.join(dataDir, "messages.json");
 
-    let messages = [];
+        let messages = [];
 
-    if (fs.existsSync(filePath)) {
-        const fileData = fs.readFileSync(filePath);
+        // Read existing messages
+        if (fs.existsSync(filePath)) {
+            const fileData = fs.readFileSync(filePath, "utf8");
 
-        messages = JSON.parse(fileData);
+            if (fileData.trim()) {
+                messages = JSON.parse(fileData);
+            }
+        }
+
+        // Add new message
+        messages.push({
+            name,
+            email,
+            phone,
+            message,
+            date: new Date().toLocaleString()
+        });
+
+        // Save messages
+        fs.writeFileSync(filePath, JSON.stringify(messages, null, 4));
+
+        res.json({
+            success: true,
+            message: "Message submitted successfully!"
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong."
+        });
     }
-
-    messages.push(newMessage);
-
-    fs.writeFileSync(filePath, JSON.stringify(messages, null, 4));
-
-    res.json({
-        success: true,
-        message: "Message submitted successfully!"
-    });
-
 });
 
 module.exports = router;
